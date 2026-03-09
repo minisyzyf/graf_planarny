@@ -1,0 +1,19 @@
+#ifndef IO_H
+#define IO_H
+
+#include "graf.h"
+// POMOCNICZA: funkcja szukająca w tablicy wierzchołków indeksu, który jest odczytywany z
+// pliku wejściowego zwraca indeks wierzchołka, w razie niepowodzenia zapisuje w tablicy nowy indeks
+Wierzcholek* pobierz_lub_dodaj(Graf* graf, int id);
+
+// funkcja wczytuje graf z pliku wejściowego i zwraca wskaźnik na zainicjowany graf
+Graf* wczytaj_graf(const char* plik);
+
+// funkcje do zapisu
+void zapisz_graf_txt(Graf* graf, const char* plik);
+void zapisz_graf_bin(Graf* graf, const char* plik);
+
+// funkcja zwalniająca zaalokowaną pamięć
+void zwolnij_graf(Graf* graf);
+
+#endif //IO_H
