@@ -69,3 +69,37 @@ Graf* wczytaj_graf(const char* plik) {
     return graf;
 }
 
+int sprawdz_spojnosc(Graf *g) {
+	if (g->V <= 1) return 1;
+
+    int *odwiedzone = (int*)calloc(g->V, sizeof(int));
+    odwiedzone[0] = 1;
+
+    int dodany;
+    do {
+    	dodany = 0;
+    	for (int i = 0; i < g->E; i++) {
+			int p = g->krawedzie[i].p->id - 1;
+            int k = g->krawedzie[i].k->id - 1;
+        }
+        if (odwiedzone[p] && !odwiedzone[k]) {
+        	odwiedzone[k] = 1;
+        	dodany = 1;
+        }
+        else if (!odwiedzone[p] && odwiedzone[k]) {
+          	odwiedzone[p] = 1;
+           	dodany = 1;
+        }
+	} while (dodany == 1);
+
+    int spojny = 1;
+    for (int i = 0; i < g->V; i++) {
+      	if (!odwiedzone[i]) {
+          	spojny = 0;
+            break;
+      	}
+    }
+    free(odwiedzone);
+    return spojny;
+}
+

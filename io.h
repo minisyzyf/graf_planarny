@@ -13,6 +13,9 @@ Graf* wczytaj_graf(const char* plik);
 void zapisz_graf_txt(Graf* graf, const char* plik);
 void zapisz_graf_bin(Graf* graf, const char* plik);
 
+// Funkcja sprawdzająca spójność grafu, zwraca 1 jeśli graf jest spójny, 0 jeśli nie jest
+int sprawdz_spojnosc(Graf *g);
+
 // funkcja zwalniająca zaalokowaną pamięć
 void zwolnij_graf(Graf* graf);
 
