@@ -3,7 +3,8 @@
 #include <string.h>
 #include "f-r.h"
 #include "tutte.h"
-#include "logger.h"
+#include "io.h"
+#include "graf.h"
 
 int main(int argc, char* argv[]) {
 
@@ -43,6 +44,49 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+
+ // Zabezpieczenie, gdyby ktos nie podal flag -i oraz -o
+    if (in == NULL || out == NULL) {
+        fprintf(stderr, "Blad: Nie podano pliku wejsciowego lub wyjsciowego.\n");
+        return 1;
+    }
+
+    // ==========================================
+    // --- SPRAWDZARKA (TEST WCZYTYWANIA) ---
+    // ==========================================
+    printf("Probujemy wczytac graf z pliku: %s\n", in);
+    Graf *g = wczytaj_graf(in);
+
+    if (g == NULL) {
+        fprintf(stderr, "Nie udalo sie wczytac grafu. Koncze dzialanie.\n");
+        return 2;
+    }
+
+    printf("\n--- WCZYTANO POMYSLNIE! ---\n");
+    printf("Liczba wierzcholkow (V): %d\n", g->V);
+    printf("Liczba krawedzi (E): %d\n\n", g->E);
+
+    printf("--- LISTA WIERZCHOLKOW ---\n");
+    for (int j = 0; j < g->V; j++) {
+        printf("Indeks tablicy [%d] | ID z pliku: %d | Stopien: %d | Wspolrzedne: (%.1f, %.1f)\n",
+               j, g->wierzcholki[j].id, g->wierzcholki[j].degree,
+               g->wierzcholki[j].x, g->wierzcholki[j].y);
+    }
+
+    printf("\n--- LISTA KRAWEDZI ---\n");
+    for (int j = 0; j < g->E; j++) {
+        printf("Krawedz '%s' | Waga: %.1f | Laczy ID: %d z ID: %d\n",
+               g->krawedzie[j].nazwa,
+               g->krawedzie[j].waga,
+               g->krawedzie[j].p->id,
+               g->krawedzie[j].k->id);
+    }
+    printf("---------------------------\n\n");
+
+    // Sprzatamy pamiec po tescie, zeby wyciekow nie bylo
+    free(g->wierzcholki);
+    free(g->krawedzie);
+    free(g);
 
     return 0;
 }
