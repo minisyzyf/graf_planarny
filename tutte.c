@@ -12,6 +12,7 @@ void ustaw_zewnetrzne_na_kole(Graf *g, double promien) {
         if (g->wierzcholki[i].is_fixed) licznik_zew++;
     }
 
+    
     if (licznik_zew == 0) return;
 
     int j = 0;
