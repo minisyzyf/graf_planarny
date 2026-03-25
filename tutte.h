@@ -3,7 +3,7 @@
 
 #include "graf.h"
 
-// Funkcja wyszukująca zewnętrzny cykl (zgodna z dokumentacją)
+// Funkcja wyszukująca zewnętrzny cykl
 void wyznacz_zewnetrzny_cykl(Graf *g);
 
 // Funkcja główna algorytmu Tutte'a
