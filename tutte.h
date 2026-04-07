@@ -7,10 +7,10 @@
 int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *przodkowie, int *na_stosie);
 
 // Funkcja wyszukująca zewnętrzny cykl
-void wyznacz_zewnetrzny_cykl(Graf *g);
+int wyznacz_zewnetrzny_cykl(Graf *g);
 
 // Funkcja główna algorytmu Tutte'a
-void oblicz_tutte(Graf *g, int it);
+int oblicz_tutte(Graf *g, int it);
 
 // Funkcja pomocnicza do rozmieszczenia wierzchołków na okręgu
 void ustaw_zewnetrzne_na_kole(Graf *g, double promien);
