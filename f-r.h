@@ -11,6 +11,6 @@ void losuj_wspolrzedne(Graf *g);
 
 // funkcja wyznaczająca iteracyjnie współrzędne wierzchołków opierając się na algorytmie
 // Fruchtermana-Reingolda
-void oblicz_f_r(Graf *g, int it);
+int oblicz_f_r(Graf *g, int it);
 
 #endif //F_R_H
