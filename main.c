@@ -5,12 +5,14 @@
 #include "tutte.h"
 #include "io.h"
 #include "graf.h"
+#include "logger.h"
 
 int main(int argc, char* argv[]) {
 
     // Sprawdzenie minimalnej liczby argumentów: prog, -i, plik1, -o, plik2
     if (argc < 5) {
-        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego]\n");
+      	fprintf(stderr, "Blad: Brak wymaganych argumentow.\n");
+        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego] [-d]\n");
         return 1;
     }
 
@@ -18,6 +20,7 @@ int main(int argc, char* argv[]) {
     char *out = NULL;
     int algorytm = 0; // 0 = F-R, 1 = Tutte
     int format = 0; // 0 = txt, 1 = bin
+    int debug = 0; // flaga debugowania; 0 = wyłączona, 1 = włączona
 
     int i;
     for (i = 1; i < argc; i++) {
@@ -31,62 +34,94 @@ int main(int argc, char* argv[]) {
             i++;
             if (strcmp(argv[i], "tutte") == 0) {
                 algorytm = 1;
-            } else {
-                algorytm = 0; // domyślnie F-R
+            }
+            else if (strcmp(argv[i], "fr") == 0) {
+              	algorytm = 0;
+            }
+            else {
+                fprintf(stderr, "Blad: Nierozpoznany algorytm.\n");
+                return 5;
             }
         }
         else if (strcmp(argv[i], "-f") == 0 && i + 1 < argc) {
             i++;
             if (strcmp(argv[i], "bin") == 0) {
                 format = 1;
-            } else {
-                format = 0; // domyślnie txt
             }
+            else if (strcmp(argv[i], "txt") == 0) {
+              	format = 0;
+            }
+            else {
+                fprintf(stderr, "Blad: Nierozpoznany format.\n");
+                return 6;
+            }
+        }
+        else if (strcmp(argv[i], "-d") == 0 && i + 1 < argc) {
+          	debug = 1;
         }
     }
 
- // Zabezpieczenie, gdyby ktos nie podal flag -i oraz -o
+	// Zabezpieczenie, gdyby ktos nie podal nazw plików
     if (in == NULL || out == NULL) {
         fprintf(stderr, "Blad: Nie podano pliku wejsciowego lub wyjsciowego.\n");
-        return 1;
+        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego] [-d]\n");
+        return 7;
     }
 
-    // ==========================================
-    // --- SPRAWDZARKA (TEST WCZYTYWANIA) ---
-    // ==========================================
-    printf("Probujemy wczytac graf z pliku: %s\n", in);
-    Graf *g = wczytaj_graf(in);
-
+    int kod_bledu = 0;
+    Graf *g = wczytaj_graf(in, &kod_bledu);
     if (g == NULL) {
-        fprintf(stderr, "Nie udalo sie wczytac grafu. Koncze dzialanie.\n");
-        return 2;
+     	if (kod_bledu == 2) fprintf(stderr, "Blad: Nie mozna otworzyc pliku wejsciowego.\n");
+        if (kod_bledu == 3) fprintf(stderr, "Blad: Nieprawidlowy format danych w pliku.\n");
+        if (kod_bledu == 8) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
+        return kod_bledu;
     }
 
-    printf("\n--- WCZYTANO POMYSLNIE! ---\n");
-    printf("Liczba wierzcholkow (V): %d\n", g->V);
-    printf("Liczba krawedzi (E): %d\n\n", g->E);
+    // Jeśli włączono flagę -d
+    if (debug) wypisz_debug(g);
 
-    printf("--- LISTA WIERZCHOLKOW ---\n");
-    for (int j = 0; j < g->V; j++) {
-        printf("Indeks tablicy [%d] | ID z pliku: %d | Stopien: %d | Wspolrzedne: (%.1f, %.1f)\n",
-               j, g->wierzcholki[j].id, g->wierzcholki[j].degree,
-               g->wierzcholki[j].x, g->wierzcholki[j].y);
+    // Sprawdzanie spójności
+    int spojnosc = sprawdz_spojnosc(g);
+    if (spojnosc == -1) {
+        fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
+        zwolnij_graf(g);
+        return 8;
+    } else if (spojnosc == 0) {
+        fprintf(stderr, "Blad: Graf wejsciowy jest niespojny.\n");
+        zwolnij_graf(g);
+        return 9;
     }
 
-    printf("\n--- LISTA KRAWEDZI ---\n");
-    for (int j = 0; j < g->E; j++) {
-        printf("Krawedz '%s' | Waga: %.1f | Laczy ID: %d z ID: %d\n",
-               g->krawedzie[j].nazwa,
-               g->krawedzie[j].waga,
-               g->krawedzie[j].p->id,
-               g->krawedzie[j].k->id);
-    }
-    printf("---------------------------\n\n");
+    // Odpalenie algorytmu
+    int iteracje = 100; // Domyślna liczba iteracji do symulacji
+    int kod_algorytmu = (algorytm == 0) ? oblicz_f_r(g, iteracje) : oblicz_tutte(g, iteracje);
 
-    // Sprzatamy pamiec po tescie, zeby wyciekow nie bylo
-    free(g->wierzcholki);
-    free(g->krawedzie);
-    free(g);
+    if (kod_algorytmu != 0) {
+        if (kod_algorytmu == 10) fprintf(stderr, "Blad: Dzielenie przez zero w symulacji.\n");
+        if (kod_algorytmu == 8) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
+        zwolnij_graf(g);
+        return kod_algorytmu;
+    }
+
+    // Zapis wynikow
+    int kod_zapisu = 0;
+    if (format == 0) {
+        kod_zapisu = zapisz_graf_txt(g, out);
+        printf("Zapisano wyniki do pliku tekstowego: %s\n", out);
+    } else {
+        kod_zapisu = zapisz_graf_bin(g, out);
+        printf("Zapisano wyniki do pliku binarnego: %s\n", out);
+    }
+
+    if (kod_zapisu != 0) {
+        fprintf(stderr, "Blad: Nie mozna utworzyc pliku wyjsciowego.\n");
+        zwolnij_graf(g);
+        return 4;
+    }
+    printf("Zapisano wyniki pomyslnie do pliku: %s\n", out);
+
+    // Sprzątanie pamięci
+    zwolnij_graf(g);
 
     return 0;
 }

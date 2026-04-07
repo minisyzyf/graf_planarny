@@ -28,12 +28,12 @@ Wierzcholek* pobierz_lub_dodaj(Graf* graf, int id) {
    	return &graf->wierzcholki[index];
 }
 
-Graf* wczytaj_graf(const char* plik) {
+Graf* wczytaj_graf(const char* plik, int *kod_bledu) {
 	FILE* f = fopen(plik, "r");
     if (f == NULL) {
-    	fprintf(stderr, "Nie mozna otworzyc pliku wejsciowego!!\n");
-        exit(1);
-    }
+      	*kod_bledu = 2;
+      	return NULL;
+	}
 
     int l_krawedzi = 0;
     char buf[BUFSIZE];
@@ -42,11 +42,24 @@ Graf* wczytaj_graf(const char* plik) {
     }
 
     Graf* graf = (Graf*)malloc(sizeof(Graf));
+    if (graf == NULL) {
+      	*kod_bledu = 8;
+        fclose(f);
+        return NULL;
+    }
     graf->E = l_krawedzi;
     graf->V = 0;
 
     graf->krawedzie = (Krawedz*)malloc(graf->E * sizeof(Krawedz));
     graf->wierzcholki = (Wierzcholek*)malloc(2 * graf->E * sizeof(Wierzcholek));
+
+    if (graf->krawedzie == NULL || graf->wierzcholki == NULL) {
+      	*kod_bledu = 8;
+    	if (graf->krawedzie != NULL) free(graf->krawedzie);
+        if (graf->wierzcholki != NULL) free(graf->wierzcholki);
+        free(graf);
+        return NULL;
+    }
 
     rewind(f);
 
@@ -55,7 +68,14 @@ Graf* wczytaj_graf(const char* plik) {
     int id_p, id_k;
     double waga;
 
-    while(fscanf(f, "%s %d %d %lf", nazwa_kr, &id_p, &id_k, &waga) != EOF) {
+    while(fscanf(f, "%15s %d %d %lf", nazwa_kr, &id_p, &id_k, &waga) != EOF) {
+      	if (przeczytano != 4) {
+            *kod_bledu = 3;
+            fclose(f);
+            zwolnij_graf(graf);
+            return NULL;
+        }
+
     	strcpy(graf->krawedzie[i].nazwa, nazwa_kr);
         graf->krawedzie[i].waga = waga;
         graf->krawedzie[i].p = pobierz_lub_dodaj(graf, id_p);
@@ -65,35 +85,45 @@ Graf* wczytaj_graf(const char* plik) {
         i++;
     }
 
+    if (graf->V == 0) {
+      	*kod_bledu = 3;
+        fclose(f);
+        zwolnij_graf(graf);
+       	return NULL;
+    }
+
     fclose(f);
+    *kod_bledu = 0;
     return graf;
 }
 
-int sprawdz_spojnosc(Graf *g) {
-	if (g->V <= 1) return 1;
+int sprawdz_spojnosc(Graf *graf) {
+	if (graf->V == 1) return 1;
 
-    int *odwiedzone = (int*)calloc(g->V, sizeof(int));
+    int *odwiedzone = (int*)calloc(graf->V, sizeof(int));
+    if (odwiedzone == NULL) return -1;
     odwiedzone[0] = 1;
 
     int dodany;
     do {
     	dodany = 0;
-    	for (int i = 0; i < g->E; i++) {
-			int p = g->krawedzie[i].p->id - 1;
-            int k = g->krawedzie[i].k->id - 1;
-        }
-        if (odwiedzone[p] && !odwiedzone[k]) {
-        	odwiedzone[k] = 1;
-        	dodany = 1;
-        }
-        else if (!odwiedzone[p] && odwiedzone[k]) {
-          	odwiedzone[p] = 1;
-           	dodany = 1;
-        }
+    	for (int i = 0; i < graf->E; i++) {
+			int p = graf->krawedzie[i].p->id - 1;
+   	        int k = graf->krawedzie[i].k->id - 1;
+
+	        if (odwiedzone[p] && !odwiedzone[k]) {
+	        	odwiedzone[k] = 1;
+	        	dodany = 1;
+        	}
+        	else if (!odwiedzone[p] && odwiedzone[k]) {
+          		odwiedzone[p] = 1;
+           		dodany = 1;
+        	}
+   		}
 	} while (dodany == 1);
 
     int spojny = 1;
-    for (int i = 0; i < g->V; i++) {
+    for (int i = 0; i < graf->V; i++) {
       	if (!odwiedzone[i]) {
           	spojny = 0;
             break;
@@ -101,5 +131,40 @@ int sprawdz_spojnosc(Graf *g) {
     }
     free(odwiedzone);
     return spojny;
+}
+
+int zapisz_graf_txt(Graf *graf, const char *plik) {
+	FILE *f = fopen(plik, "w");
+    if (f == NULL) return 4;
+
+    fprintf(f, "%d", graf->V);
+	for(int i = 0; i < graf->V; i++) {
+        fprintf(f, "%d %.2f %.2f\n", graf->wierzcholki[i].id, graf->wierzcholki[i].x, graf->wierzcholki[i].y);
+    }
+    fclose(f);
+    return 0;
+}
+
+int zapisz_graf_bin(Graf *graf, const char *plik) {
+  	FILE *f = fopen(plik, "wb");
+    if (f == NULL) return 4;
+
+    fwrite(&(graf->V), sizeof(int), 1, f);
+    for(int i = 0; i < graf->V; i++) {
+      	fwrite(&(graf->wierzcholki[i].id), sizeof(int), 1, f);
+        fwrite(&(graf->wierzcholki[i].x), sizeof(double), 1, f);
+        fwrite(&(graf->wierzcholki[i].y), sizeof(double), 1, f);
+    }
+
+    fclose(f);
+    return 0;
+}
+
+void zwolnij_graf(Graf *graf) {
+  	if (graf != NULL) {
+    	if (graf->wierzcholki != NULL) free(graf->wierzcholki);
+        if (graf->krawedzie != NULL) free(graf->krawedzie);
+        free(graf);
+    }
 }
 

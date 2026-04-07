@@ -3,6 +3,9 @@
 
 #include "graf.h"
 
+// Funkcja pomocnicza realizująca rekurencyjne przeszukiwanie (do "wyznacz_zewnetrzny_cykl")
+int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *przodkowie, int *na_stosie);
+
 // Funkcja wyszukująca zewnętrzny cykl
 void wyznacz_zewnetrzny_cykl(Graf *g);
 

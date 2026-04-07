@@ -3,11 +3,11 @@
 #include <stdlib.h>
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
-// Prywatna funkcja pomocnicza realizująca rekurencyjne przeszukiwanie
-static int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *przodkowie, int *na_stosie) {
+// Funkcja pomocnicza realizująca rekurencyjne przeszukiwanie
+int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *przodkowie, int *na_stosie) {
     odwiedzone[u] = 1;
     na_stosie[u] = 1;
 
@@ -49,12 +49,17 @@ static int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *pr
     return 0;
 }
 
-void wyznacz_zewnetrzny_cykl(Graf *g) {
-    if (g->V < 3) return;
-
+int wyznacz_zewnetrzny_cykl(Graf *g) {
     int *odwiedzone = (int*)calloc(g->V, sizeof(int));
     int *przodkowie = (int*)malloc(g->V * sizeof(int));
     int *na_stosie = (int*)calloc(g->V, sizeof(int));
+
+    if (!odwiedzone || !przodkowie || !na_stosie) {
+        if (odwiedzone) free(odwiedzone);
+        if (przodkowie) free(przodkowie);
+        if (na_stosie) free(na_stosie);
+        return 7;
+    }
 
     for (int i = 0; i < g->V; i++) przodkowie[i] = -1;
 
@@ -68,6 +73,8 @@ void wyznacz_zewnetrzny_cykl(Graf *g) {
     free(odwiedzone);
     free(przodkowie);
     free(na_stosie);
+
+    return 0;
 }
 
 void ustaw_zewnetrzne_na_kole(Graf *g, double promien) {
@@ -89,11 +96,24 @@ void ustaw_zewnetrzne_na_kole(Graf *g, double promien) {
     }
 }
 
-void oblicz_tutte(Graf *g, int it) {
-    if (g->V < 3) return;
+int oblicz_tutte(Graf *g, int it) {
+  	if (g->V == 1) {
+    	g->wierzcholki[0].x = 0.0;
+        g->wierzcholki[0].y = 0.0;
+        return;
+   	}
+
+    if (g->V == 2) {
+        g->wierzcholki[0].x = 0.0;
+        g->wierzcholki[0].y = 0.0;
+        g->wierzcholki[1].x = 40.0;
+        g->wierzcholki[1].y = 0.0;
+        return;
+    }
 
     // 1. Znalezienie cyklu
-    wyznacz_zewnetrzny_cykl(g);
+    int kod_alokacji = wyznacz_zewnetrzny_cykl(g);
+    if (kod_alokacji == 7) return 7;
 
     // Bezpiecznik: jeśli nie znaleziono cyklu, weź pierwsze trzy
     int czy_istnieja_stale = 0;
@@ -132,4 +152,6 @@ void oblicz_tutte(Graf *g, int it) {
             }
         }
     }
+
+    return 0;
 }
