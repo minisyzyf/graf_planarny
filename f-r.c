@@ -19,7 +19,7 @@ int oblicz_f_r(Graf *g, int it) {
   	if (g->V == 1) {
     	g->wierzcholki[0].x = 0.0;
         g->wierzcholki[0].y = 0.0;
-        return;
+        return 0;
    	}
 
     double k = 50; // bo k = sqrt(pole/il. wierzcholkow) = sqrt(2500*(g->V)/(g->V)) = 50

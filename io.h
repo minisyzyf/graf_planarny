@@ -7,7 +7,7 @@
 Wierzcholek* pobierz_lub_dodaj(Graf* graf, int id);
 
 // funkcja wczytuje graf z pliku wejściowego i zwraca wskaźnik na zainicjowany graf
-Graf* wczytaj_graf(const char* plik);
+Graf* wczytaj_graf(const char* plik, int* kod_bledu);
 
 // funkcje do zapisu
 int zapisz_graf_txt(Graf* graf, const char* plik);

@@ -67,8 +67,9 @@ Graf* wczytaj_graf(const char* plik, int *kod_bledu) {
     char nazwa_kr[MAX_ID_LEN];
     int id_p, id_k;
     double waga;
+    int przeczytano;
 
-    while(fscanf(f, "%15s %d %d %lf", nazwa_kr, &id_p, &id_k, &waga) != EOF) {
+    while((przeczytano = fscanf(f, "%15s %d %d %lf", nazwa_kr, &id_p, &id_k, &waga)) != EOF) {
       	if (przeczytano != 4) {
             *kod_bledu = 3;
             fclose(f);

@@ -100,7 +100,7 @@ int oblicz_tutte(Graf *g, int it) {
   	if (g->V == 1) {
     	g->wierzcholki[0].x = 0.0;
         g->wierzcholki[0].y = 0.0;
-        return;
+        return 0;
    	}
 
     if (g->V == 2) {
@@ -108,7 +108,7 @@ int oblicz_tutte(Graf *g, int it) {
         g->wierzcholki[0].y = 0.0;
         g->wierzcholki[1].x = 40.0;
         g->wierzcholki[1].y = 0.0;
-        return;
+        return 0;
     }
 
     // 1. Znalezienie cyklu
