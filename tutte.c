@@ -26,10 +26,11 @@ int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *przodkowi
             if(g->wierzcholki[j].id == sasiad->id) { v_idx = j; break; }
         }
 
+       	if (v_idx == -1) continue;
         if (v_idx == rodzic) continue; // Pomiń powrót bezpośrednio do rodzica
 
         if (na_stosie[v_idx]) {
-            // WYKRYTO CYKL: Oznaczamy wierzchołki jako stałe (is_fixed)
+            // Gdy wykryto cykl, znaczamy wierzchołki jako stałe (is_fixed)
             int obecny = u;
             g->wierzcholki[v_idx].is_fixed = 1;
             while (obecny != v_idx && obecny != -1) {
@@ -115,7 +116,7 @@ int oblicz_tutte(Graf *g, int it) {
     int kod_alokacji = wyznacz_zewnetrzny_cykl(g);
     if (kod_alokacji == 7) return 7;
 
-    // Bezpiecznik: jeśli nie znaleziono cyklu, weź pierwsze trzy
+    // Jeśli nie znaleziono cyklu, weź pierwsze trzy
     int czy_istnieja_stale = 0;
     for(int i=0; i < g->V; i++) if(g->wierzcholki[i].is_fixed) czy_istnieja_stale = 1;
     
@@ -123,10 +124,13 @@ int oblicz_tutte(Graf *g, int it) {
         for(int i=0; i < (g->V > 3 ? 3 : g->V); i++) g->wierzcholki[i].is_fixed = 1;
     }
 
+    // Dostosowanie rozstrzału wierzchołków na planszy proporcjonalnie do rozstrzału w f-r.c
+    double promien = 25.0 * sqrt(g->V);
+    if (promien < 50.0) promien = 50.0;
     // 2. Rozmieszczenie na okręgu
-    ustaw_zewnetrzne_na_kole(g, 400.0);
+    ustaw_zewnetrzne_na_kole(g, promien);
 
-    // 3. Relaksacja (metoda barycentryczna)
+    // 3. Metoda barycentryczna
     for (int iter = 0; iter < it; iter++) {
         for (int i = 0; i < g->V; i++) {
             if (g->wierzcholki[i].is_fixed) continue;

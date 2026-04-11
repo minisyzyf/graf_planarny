@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     // Sprawdzenie minimalnej liczby argumentów: prog, -i, plik1, -o, plik2
     if (argc < 5) {
       	fprintf(stderr, "Blad: Brak wymaganych argumentow.\n");
-        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego] [-d]\n");
+        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego] [-n liczba iteracji] [-d]\n");
         return 1;
     }
 
@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
     int algorytm = 0; // 0 = F-R, 1 = Tutte
     int format = 0; // 0 = txt, 1 = bin
     int debug = 0; // flaga debugowania; 0 = wyłączona, 1 = włączona
+    int iteracje_uzytkownika = 0; // jeśli zostanie 0 - program sam dobiera ilość iteracji
 
     int i;
     for (i = 1; i < argc; i++) {
@@ -59,6 +60,9 @@ int main(int argc, char* argv[]) {
         else if (strcmp(argv[i], "-d") == 0 && i + 1 < argc) {
           	debug = 1;
         }
+        else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
+            iteracje_uzytkownika = atoi(argv[++i]);
+        }
     }
 
 	// Zabezpieczenie, gdyby ktos nie podal nazw plików
@@ -92,10 +96,22 @@ int main(int argc, char* argv[]) {
         return 9;
     }
 
-    // Odpalenie algorytmu
-    int iteracje = 100; // Domyślna liczba iteracji do symulacji
-    int kod_algorytmu = (algorytm == 0) ? oblicz_f_r(g, iteracje) : oblicz_tutte(g, iteracje);
+    // Ustawienie ilości iteracji (zależnie od użytkownika lub uruchamianego algorytmu)
+    int iteracje = 0;
+    if (iteracje_uzytkownika > 0) { // nawet jeśli użytkownik poda ujemną liczbę, nie ma szans na błąd
+      	iteracje = iteracje_uzytkownika;
+    }
+    else {
+      	if (algorytm == 0) {
+          	iteracje = 100 + (5 * g->V);
+    	} else {
+      		iteracje = 100 + (10 * g->V);
+    	}
+    }
+    printf("Liczba iteracji do symulacji: %d\n", iteracje);
 
+    // Odpalenie algorytmu
+    int kod_algorytmu = (algorytm == 0) ? oblicz_f_r(g, iteracje) : oblicz_tutte(g, iteracje);
     if (kod_algorytmu != 0) {
         if (kod_algorytmu == 10) fprintf(stderr, "Blad: Dzielenie przez zero w symulacji.\n");
         if (kod_algorytmu == 8) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");

@@ -109,14 +109,14 @@ int sprawdz_spojnosc(Graf *graf) {
     do {
     	dodany = 0;
     	for (int i = 0; i < graf->E; i++) {
-			int p = graf->krawedzie[i].p->id - 1;
-   	        int k = graf->krawedzie[i].k->id - 1;
+			int p = graf->krawedzie[i].p - graf->wierzcholki;
+   	        int k = graf->krawedzie[i].k - graf->wierzcholki;
 
-	        if (odwiedzone[p] && !odwiedzone[k]) {
+	        if (odwiedzone[p] == 1 && odwiedzone[k] == 0) {
 	        	odwiedzone[k] = 1;
 	        	dodany = 1;
         	}
-        	else if (!odwiedzone[p] && odwiedzone[k]) {
+        	else if (odwiedzone[p] == 0 && odwiedzone[k] == 1) {
           		odwiedzone[p] = 1;
            		dodany = 1;
         	}
