@@ -118,7 +118,6 @@ int main(int argc, char* argv[]) {
         zwolnij_graf(g);
         return 4;
     }
-    printf("Zapisano wyniki pomyslnie do pliku: %s\n", out);
 
     // Sprzątanie pamięci
     zwolnij_graf(g);

@@ -138,7 +138,7 @@ int zapisz_graf_txt(Graf *graf, const char *plik) {
 	FILE *f = fopen(plik, "w");
     if (f == NULL) return 4;
 
-    fprintf(f, "%d", graf->V);
+    fprintf(f, "%d\n", graf->V);
 	for(int i = 0; i < graf->V; i++) {
         fprintf(f, "%d %.2f %.2f\n", graf->wierzcholki[i].id, graf->wierzcholki[i].x, graf->wierzcholki[i].y);
     }

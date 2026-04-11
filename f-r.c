@@ -22,12 +22,18 @@ int oblicz_f_r(Graf *g, int it) {
         return 0;
    	}
 
+    losuj_wspolrzedne(g);
     double k = 50; // bo k = sqrt(pole/il. wierzcholkow) = sqrt(2500*(g->V)/(g->V)) = 50
     double temperatura_poczatkowa = bok_planszy / 10; // maksymalny przeskok w pierwszej iteracji
 	double temperatura = temperatura_poczatkowa;
 
     for (int iter = 0; iter < it; iter++) {
-      // 1. Odpychanie - każdy od każdego
+      // zerowanie sił
+      	for (int i = 0; i < g->V; i++) {
+            g->wierzcholki[i].dx = 0.0;
+            g->wierzcholki[i].dy = 0.0;
+        }
+        // 1. ddpychanie - każdy od każdego
       	for (int v = 0; v < g->V; v++) {
           	for (int u = 0; u < g->V; u++) {
             	if (v != u) {
@@ -36,9 +42,6 @@ int oblicz_f_r(Graf *g, int it) {
 
                     double dist = sqrt(delta_x * delta_x + delta_y * delta_y);
                     if (dist < EPS) dist = EPS;
-                    if (dist == 0.0) {
-                        return 9;
-                    }
 
                     double sila_odp = k * k / dist;
                     g->wierzcholki[v].dx += (delta_x / dist) * sila_odp;
@@ -47,7 +50,7 @@ int oblicz_f_r(Graf *g, int it) {
           	}
       	}
 
-        // 2. Przyciąganie - wzdłuż krawędzi dla danego wierzchołka
+        // 2. przyciąganie - wzdłuż krawędzi dla danego wierzchołka
         for (int e = 0; e < g->E; e++) {
           	Wierzcholek *w_p = g->krawedzie[e].p;
             Wierzcholek *w_k = g->krawedzie[e].k;
@@ -56,9 +59,6 @@ int oblicz_f_r(Graf *g, int it) {
             double delta_y = w_k->y - w_p->y;
             double dist = sqrt(delta_x * delta_x + delta_y * delta_y);
             if (dist < EPS) dist = EPS;
-			if (dist == 0.0) {
-                return 9;
-            }
 
             double sila_przyciag = dist * dist / k;
             w_k->dx -= (delta_x / dist) * sila_przyciag;
