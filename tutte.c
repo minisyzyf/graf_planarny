@@ -14,7 +14,7 @@ int szukaj_cyklu_dfs(Graf *g, int u, int rodzic, int *odwiedzone, int *przodkowi
     for (int i = 0; i < g->E; i++) {
         Wierzcholek *sasiad = NULL;
         
-        // Identyfikacja sąsiada w grafie nieskierowanym
+        // Identyfikacja sąsiada
         if (g->krawedzie[i].p->id == g->wierzcholki[u].id) sasiad = g->krawedzie[i].k;
         else if (g->krawedzie[i].k->id == g->wierzcholki[u].id) sasiad = g->krawedzie[i].p;
         

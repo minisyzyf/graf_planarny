@@ -32,7 +32,7 @@ void wypisz_debug(Graf *graf) {
 
 void wypisz_wyniki_terminal(Graf *graf) {
     printf("\n=== WYNIKI OBLICZEN (Wspolrzedne) ===\n");
-    int ilosc = graf->V > 50 ? 50 : graf->V; // Tu dajemy limit np. 50
+    int ilosc = graf->V > 50 ? 50 : graf->V;
     for(int i = 0; i < ilosc; i++) {
         printf("ID: %d | X: %.2f | Y: %.2f\n",
             graf->wierzcholki[i].id,
