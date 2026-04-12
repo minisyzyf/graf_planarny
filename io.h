@@ -4,7 +4,7 @@
 #include "graf.h"
 // POMOCNICZA: funkcja szukająca w tablicy wierzchołków indeksu, który jest odczytywany z
 // pliku wejściowego zwraca indeks wierzchołka, w razie niepowodzenia zapisuje w tablicy nowy indeks
-Wierzcholek* pobierz_lub_dodaj(Graf* graf, int id);
+Wierzcholek* pobierz_lub_dodaj(Graf* graf, unsigned int id);
 
 // funkcja wczytuje graf z pliku wejściowego i zwraca wskaźnik na zainicjowany graf
 Graf* wczytaj_graf(const char* plik, int* kod_bledu);

@@ -6,7 +6,7 @@
 
 #define BUFSIZE 128
 
-Wierzcholek* pobierz_lub_dodaj(Graf* graf, int id) {
+Wierzcholek* pobierz_lub_dodaj(Graf* graf, unsigned int id) {
     int i;
     for (i = 0; i < graf->V; i++) {
 		if(graf->wierzcholki[i].id == id) {
@@ -65,7 +65,7 @@ Graf* wczytaj_graf(const char* plik, int *kod_bledu) {
 
     int i = 0;
     char nazwa_kr[MAX_ID_LEN];
-    int id_p, id_k;
+    unsigned int id_p, id_k;
     double waga;
     int przeczytano;
 
@@ -152,9 +152,9 @@ int zapisz_graf_bin(Graf *graf, const char *plik) {
 
     fwrite(&(graf->V), sizeof(int), 1, f);
     for(int i = 0; i < graf->V; i++) {
-      	fwrite(&(graf->wierzcholki[i].id), sizeof(int), 1, f);
-        fwrite(&(graf->wierzcholki[i].x), sizeof(double), 1, f);
-        fwrite(&(graf->wierzcholki[i].y), sizeof(double), 1, f);
+      	fwrite(&(graf->wierzcholki[i].id), sizeof(unsigned int), 1, f);
+        fwrite(&graf->wierzcholki[i].x, sizeof(double), 1, f);
+        fwrite(&graf->wierzcholki[i].y, sizeof(double), 1, f);
     }
 
     fclose(f);

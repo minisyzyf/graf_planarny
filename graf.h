@@ -4,7 +4,7 @@
 #define MAX_ID_LEN 16 // maksymalna długość nazwy krawędzi
 
 typedef struct {
-    int id;
+    unsigned int id;
     double x;
     double y;
 
@@ -13,10 +13,10 @@ typedef struct {
     double dy;
 
     // flaga dla algorytmu Tuttego (1 = zewnętrzny, 0 = wewnętrzny/wolny)
-    int is_fixed;
+    unsigned int is_fixed;
 
     // stopień wierzchołka, do obliczania średniej w algorytmie Tuttego
-    int degree;
+    unsigned int degree;
 }Wierzcholek;
 
 typedef struct {
