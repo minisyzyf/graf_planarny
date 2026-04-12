@@ -8,14 +8,14 @@ void wypisz_debug(Graf *graf) {
 
     int ilosc = graf->V > 20 ? 20 : graf->V;
 
-    printf("--- LISTA WIERZCHOLKOW ---\n");
+    printf("--- LISTA WIERZCHOLKOW (Pokazuje max 20) ---\n");
     for (int j = 0; j < ilosc; j++) {
         printf("Indeks [%d] | ID: %d | Stopien: %d | is_fixed: %d | Wsp: (%.1f, %.1f)\n",
                j, graf->wierzcholki[j].id, graf->wierzcholki[j].degree,
                graf->wierzcholki[j].is_fixed, graf->wierzcholki[j].x, graf->wierzcholki[j].y);
     }
 
-    printf("\n--- LISTA KRAWEDZI ---\n");
+    printf("\n--- LISTA KRAWEDZI (Pokazuje max 20) ---\n");
     for (int j = 0; j < ilosc; j++) {
         printf("Krawedz '%s' | Waga: %.1f | Laczy ID: %d z ID: %d\n",
                graf->krawedzie[j].nazwa,
@@ -24,4 +24,39 @@ void wypisz_debug(Graf *graf) {
                graf->krawedzie[j].k->id);
     }
     printf("===================================\n\n");
+}
+
+void wypisz_wyniki_terminal(Graf *graf) {
+    printf("\n=== WYNIKI OBLICZEN (Wspolrzedne) ===\n");
+    int ilosc = graf->V > 50 ? 50 : graf->V; // Tu dajemy limit np. 50
+    for(int i = 0; i < ilosc; i++) {
+        printf("ID: %d | X: %.2f | Y: %.2f\n",
+               graf->wierzcholki[i].id,
+               graf->wierzcholki[i].x,
+               graf->wierzcholki[i].y);
+    }
+    if (graf->V > 50) {
+        printf("... i %d kolejnych wierzcholkow (zapisano do pliku).\n", graf->V - 50);
+    }
+    printf("=====================================\n\n");
+}
+
+void wypisz_pomoc() {
+    printf("\n");
+    printf("========================================================\n");
+    printf("   GENERATOR UKLADOW GRAFOW (Fruchterman-Reingold / Tutte)\n");
+    printf("========================================================\n");
+    printf("Uzycie programu:\n");
+    printf("  ./graph_layout -i <plik_wejsciowy> -o <plik_wyjsciowy> -a <algorytm> [opcje]\n\n");
+    printf("Wymagane flagi:\n");
+    printf("  -i <sciezka>  : Plik wejsciowy z definicja grafu\n");
+    printf("  -o <sciezka>  : Plik wyjsciowy z zapisanymi wspolrzednymi\n");
+    printf("  -a <algorytm> : 'fr' (Fruchterman-Reingold) lub 'tutte' (Tutte)\n\n");
+    printf("Opcjonalne flagi:\n");
+    printf("  -f <format>   : Format wyjsciowy: 'txt' (domyslny) lub 'bin' (binarny)\n");
+    printf("  -d            : Tryb debug (wypisuje logi i wyniki bezposrednio w konsoli)\n");
+    printf("  -h            : Wyswietla ten ekran pomocy\n\n");
+    printf("Przyklad:\n");
+    printf("  ./graph_layout -i graf.txt -o wynik.txt -a fr -d\n");
+    printf("========================================================\n\n");
 }

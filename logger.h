@@ -1,9 +1,10 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "graf.h"
+#include "io.h" // Lub plik, w którym masz zdefiniowaną strukturę Graf
 
-// Funkcja wypisujaca zawartosc grafu w celach testowych
-void wypisz_debug(Graf *g);
+void wypisz_debug(Graf *graf);
+void wypisz_wyniki_terminal(Graf *graf);
+void wypisz_pomoc();
 
 #endif

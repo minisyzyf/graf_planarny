@@ -9,10 +9,9 @@
 
 int main(int argc, char* argv[]) {
 
-    // Sprawdzenie minimalnej liczby argumentów: prog, -i, plik1, -o, plik2
-    if (argc < 5) {
-      	fprintf(stderr, "Blad: Brak wymaganych argumentow.\n");
-        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego] [-n liczba iteracji] [-d]\n");
+    if (argc == 1) {
+        fprintf(stderr, "Blad: Nie podano zadnych argumentow.\n");
+        wypisz_pomoc();
         return 1;
     }
 
@@ -25,11 +24,23 @@ int main(int argc, char* argv[]) {
 
     int i;
     for (i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
+        if (strcmp(argv[i], "-h") == 0) {
+          	wypisz_pomoc();
+            return 0;
+        }
+        else if (strcmp(argv[i], "-d") == 0) {
+          	debug = 1;
+        }
+        else if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
             in = argv[++i];
         }
         else if (strcmp(argv[i], "-o") == 0 && i + 1 < argc) {
-            out = argv[++i];
+        	if (i + 1 < argc && argv[i+1][0] != '-') {
+                out = argv[++i];
+            } else {
+                fprintf(stderr, "Blad: Oczekiwano nazwy pliku po fladze -o.\n");
+                wypisz_pomoc(); return 11;
+            }
         }
         else if (strcmp(argv[i], "-a") == 0 && i + 1 < argc) {
             i++;
@@ -41,6 +52,7 @@ int main(int argc, char* argv[]) {
             }
             else {
                 fprintf(stderr, "Blad: Nierozpoznany algorytm.\n");
+                wypisz_pomoc();
                 return 5;
             }
         }
@@ -54,22 +66,25 @@ int main(int argc, char* argv[]) {
             }
             else {
                 fprintf(stderr, "Blad: Nierozpoznany format.\n");
+                wypisz_pomoc();
                 return 6;
             }
         }
-        else if (strcmp(argv[i], "-d") == 0 && i + 1 < argc) {
-          	debug = 1;
-        }
         else if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) {
             iteracje_uzytkownika = atoi(argv[++i]);
+        }
+        else {
+            fprintf(stderr, "Blad: Nierozpoznany argument: '%s'\n", argv[i]);
+            wypisz_pomoc();
+            return 10;
         }
     }
 
 	// Zabezpieczenie, gdyby ktos nie podal nazw plików
     if (in == NULL || out == NULL) {
         fprintf(stderr, "Blad: Nie podano pliku wejsciowego lub wyjsciowego.\n");
-        fprintf(stderr, "Uzycie: -i <plik_grafu> -o <plik_wyjsciowy> [-a algorytm] [-f format_pliku_wyjsciowego] [-d]\n");
-        return 7;
+        wypisz_pomoc();
+        return 1;
     }
 
     int kod_bledu = 0;
@@ -77,7 +92,7 @@ int main(int argc, char* argv[]) {
     if (g == NULL) {
      	if (kod_bledu == 2) fprintf(stderr, "Blad: Nie mozna otworzyc pliku wejsciowego.\n");
         if (kod_bledu == 3) fprintf(stderr, "Blad: Nieprawidlowy format danych w pliku.\n");
-        if (kod_bledu == 8) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
+        if (kod_bledu == 7) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
         return kod_bledu;
     }
 
@@ -89,11 +104,11 @@ int main(int argc, char* argv[]) {
     if (spojnosc == -1) {
         fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
         zwolnij_graf(g);
-        return 8;
+        return 7;
     } else if (spojnosc == 0) {
         fprintf(stderr, "Blad: Graf wejsciowy jest niespojny.\n");
         zwolnij_graf(g);
-        return 9;
+        return 8;
     }
 
     // Ustawienie ilości iteracji (zależnie od użytkownika lub uruchamianego algorytmu)
@@ -113,11 +128,14 @@ int main(int argc, char* argv[]) {
     // Odpalenie algorytmu
     int kod_algorytmu = (algorytm == 0) ? oblicz_f_r(g, iteracje) : oblicz_tutte(g, iteracje);
     if (kod_algorytmu != 0) {
-        if (kod_algorytmu == 10) fprintf(stderr, "Blad: Dzielenie przez zero w symulacji.\n");
-        if (kod_algorytmu == 8) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
+        if (kod_algorytmu == 9) fprintf(stderr, "Blad: Dzielenie przez zero w symulacji.\n");
+        if (kod_algorytmu == 7) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
         zwolnij_graf(g);
         return kod_algorytmu;
     }
+
+    // Jeśli włączono flagę -d
+    if (debug) wypisz_wyniki_terminal(g);
 
     // Zapis wynikow
     int kod_zapisu = 0;
