@@ -140,7 +140,7 @@ int zapisz_graf_txt(Graf *graf, const char *plik) {
 
     fprintf(f, "%d\n", graf->V);
 	for(int i = 0; i < graf->V; i++) {
-        fprintf(f, "%d %.2f %.2f\n", graf->wierzcholki[i].id, graf->wierzcholki[i].x, graf->wierzcholki[i].y);
+        fprintf(f, "%d %.4f %.4f\n", graf->wierzcholki[i].id, graf->wierzcholki[i].x, graf->wierzcholki[i].y);
     }
     fclose(f);
     return 0;
