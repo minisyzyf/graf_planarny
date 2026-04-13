@@ -4,7 +4,7 @@
 #include "io.h"
 #include "graf.h"
 
-#define EPS 0.001 // zakładamy, że minimalne przesunięcie do 3 liczb po przecinku
+#define EPS 0.000001 // zakładamy, że minimalne przesunięcie do 6 liczb po przecinku
 
 // funkcja rozrzucająca wierzchołki losowo, aby nadać im pewne współrzędne
 void losuj_wspolrzedne(Graf *g);
