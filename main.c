@@ -93,6 +93,7 @@ int main(int argc, char* argv[]) {
      	if (kod_bledu == 2) fprintf(stderr, "Blad: Nie mozna otworzyc pliku wejsciowego.\n");
         if (kod_bledu == 3) fprintf(stderr, "Blad: Nieprawidlowy format danych w pliku.\n");
         if (kod_bledu == 7) fprintf(stderr, "Blad: Nieudana alokacja pamieci.\n");
+		if (kod_bledu == 12) fprintf(stderr, "Blad: Wykryto petle wlasna.\n");
         return kod_bledu;
     }
 
