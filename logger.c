@@ -60,6 +60,9 @@ void wypisz_pomoc() {
     printf("  -f <format>   : Format wyjsciowy: 'txt' (domyslny) lub 'bin' (binarny)\n");
     printf("  -d            : Tryb debug (wypisuje strukture wczytanego grafu i wyniki bezposrednio w konsoli)\n");
     printf("  -h            : Wyswietla ten ekran pomocy\n\n");
+    printf("Wazne ograniczenia programu:\n");
+    printf("  - Graf musi byc spojny.\n");
+    printf("  - Petle wlasne (krawedzie do samego siebie) sa zabronione.\n\n");
     printf("Przyklad:\n");
     printf("  ./graf_planarny -i graf.txt -o wynik.txt -a fr -d\n");
     printf("========================================================\n\n");
