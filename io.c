@@ -77,7 +77,6 @@ Graf* wczytaj_graf(const char* plik, int *kod_bledu) {
             return NULL;
         }
 		if (id_p == id_k) {
-            fprintf(stderr, "Blad: Wykryto petle wlasna.\n");
             *kod_bledu = 12;
             fclose(f);
             zwolnij_graf(graf);
