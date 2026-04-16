@@ -97,6 +97,13 @@ int main(int argc, char* argv[]) {
         return kod_bledu;
     }
 
+    // Weryfikacja warunku koniecznego planarności (Wzór Eulera)
+	if (graf->V >= 3 && graf->E > 3 * graf->V - 6) {
+    	fprintf(stderr, "Blad: Graf jest zbyt gesty, by mogl byc planarny (E > 3V - 6).\n");
+    	zwolnij_graf(graf);
+    	return 13;
+	}
+
     // Jeśli włączono flagę -d
     if (debug) wypisz_debug(g);
 
