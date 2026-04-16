@@ -44,8 +44,8 @@ int oblicz_f_r(Graf *g, int it) {
                     if (dist < EPS) dist = EPS;
 
                     double sila_odp = k * k / dist;
-                    g->wierzcholki[v].dx += (delta_x / dist) * sila_odp;
-                    g->wierzcholki[v].dy += (delta_y / dist) * sila_odp;
+                    g->wierzcholki[v].dx += (delta_x / dist) * sila_odp; // F_x = cos(a)*F
+                    g->wierzcholki[v].dy += (delta_y / dist) * sila_odp; // F_y = sin(a)*F
                 }
           	}
       	}
@@ -61,8 +61,9 @@ int oblicz_f_r(Graf *g, int it) {
             if (dist < EPS) dist = EPS;
 
             double sila_przyciag = dist * dist / k;
-            w_k->dx -= (delta_x / dist) * sila_przyciag;
-            w_k->dy -= (delta_y / dist) * sila_przyciag;
+            // sumowanie składowych sił przyciągania z siłami odpychania obliczonymi w poprzedniej pętli
+            w_k->dx -= (delta_x / dist) * sila_przyciag; // F_x = cos(a)*F
+            w_k->dy -= (delta_y / dist) * sila_przyciag; // F_y = sin(a)*F
             w_p->dx += (delta_x / dist) * sila_przyciag;
             w_p->dy += (delta_y / dist) * sila_przyciag;
        	}
